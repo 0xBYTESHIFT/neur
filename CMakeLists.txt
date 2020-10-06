@@ -15,9 +15,13 @@ if(NOT OpenBLAS_FOUND)
     message(FATAL_ERROR "no openblas")
 endif()
 
+add_library(neur INTERFACE)
+target_include_directories(neur INTERFACE include/) 
+
 add_executable(brain_test main.cpp)
 target_link_libraries(brain_test
     OpenBLAS::OpenBLAS
+    neur
 )
 
 # add_executable(test_chromosome tests/test_chromosome.cpp)
