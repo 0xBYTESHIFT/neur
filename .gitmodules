@@ -1,0 +1,9 @@
+[submodule "submodules/xtensor-xtl"]
+	path = submodules/xtensor-xtl
+	url = https://github.com/xtensor-stack/xtl
+[submodule "submodules/xsimd"]
+	path = submodules/xsimd
+	url = https://github.com/xtensor-stack/xsimd
+[submodule "submodules/xtensor"]
+	path = submodules/xtensor
+	url = https://github.com/xtensor-stack/xtensor
