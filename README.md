@@ -3,13 +3,8 @@ library to simulate simple neural networks
 
 # requrements
 * OpenBLAS
-* cmake 3.x
+* cmake 3.11+
 * g++ or clang
-
-# getting submodules
-```bash
-git submodule update --init --recursive
-```
 
 # installation
 

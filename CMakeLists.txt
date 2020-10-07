@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.11.0)
 project(brain VERSION 0.1.0)
 
 include(CTest)
@@ -14,6 +14,20 @@ set(BLAS_INCLUDE_DIR OpenBLAS_INCLUDE_DIR)
 if(NOT OpenBLAS_FOUND)
     message(FATAL_ERROR "no openblas")
 endif()
+
+include(FetchContent)
+FetchContent_Declare(xsimd
+  GIT_REPOSITORY https://github.com/xtensor-stack/xsimd
+)
+FetchContent_Declare(xtl
+  GIT_REPOSITORY https://github.com/xtensor-stack/xtl
+)
+FetchContent_Declare(xtensor
+  GIT_REPOSITORY https://github.com/xtensor-stack/xtensor
+)
+FetchContent_MakeAvailable(xtl)
+FetchContent_MakeAvailable(xtensor)
+FetchContent_MakeAvailable(xsimd)
 
 add_library(neur INTERFACE)
 target_include_directories(neur INTERFACE include/) 
