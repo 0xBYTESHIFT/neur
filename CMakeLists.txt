@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.11.0)
-project(brain VERSION 0.1.0)
+project(neur VERSION 0.1.1)
 
 include(CTest)
 enable_testing()
@@ -16,18 +16,29 @@ if(NOT OpenBLAS_FOUND)
 endif()
 
 include(FetchContent)
-FetchContent_Declare(xsimd
-  GIT_REPOSITORY https://github.com/xtensor-stack/xsimd
-)
-FetchContent_Declare(xtl
-  GIT_REPOSITORY https://github.com/xtensor-stack/xtl
-)
-FetchContent_Declare(xtensor
-  GIT_REPOSITORY https://github.com/xtensor-stack/xtensor
-)
-FetchContent_MakeAvailable(xtl)
-FetchContent_MakeAvailable(xtensor)
-FetchContent_MakeAvailable(xsimd)
+include(CheckCXXCompilerFlag)
+
+macro(find_fetch package repo)
+    find_package(${package} QUIET)
+    if(NOT ${${package}_FOUND})
+        message(STATUS "fetching ${package} from ${repo}")
+        FetchContent_Declare(${package}
+            GIT_REPOSITORY ${repo}
+        )
+        FetchContent_MakeAvailable(${package})
+        FetchContent_GetProperties(${package})
+        if(NOT ${${package}_POPULATED})
+          FetchContent_Populate(${package})
+          add_subdirectory(${${package}_SOURCE_DIR} ${${package}_BINARY_DIR})
+        endif(NOT ${${package}_POPULATED})
+        list(APPEND CMAKE_PREFIX_PATH ${${package}_BINARY_DIR})
+    endif(NOT ${${package}_FOUND})
+endmacro()
+
+find_fetch(xtl https://github.com/xtensor-stack/xtl)
+find_fetch(xsimd https://github.com/xtensor-stack/xsimd)
+find_fetch(xtensor https://github.com/xtensor-stack/xtensor)
+find_fetch(xtensor-blas https://github.com/xtensor-stack/xtensor-blas)
 
 add_library(neur INTERFACE)
 target_include_directories(neur INTERFACE include/) 
@@ -36,6 +47,10 @@ add_executable(brain_test main.cpp)
 target_link_libraries(brain_test
     OpenBLAS::OpenBLAS
     neur
+    xtl
+    xsimd
+    xtensor
+    xtensor-blas
 )
 
 # add_executable(test_chromosome tests/test_chromosome.cpp)
