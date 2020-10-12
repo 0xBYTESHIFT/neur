@@ -7,6 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
+  build_check:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -24,7 +25,7 @@ jobs:
         cmake -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=ON -DUSE_BLAS=OFF ..
         cmake --build . 
         cd .. && rm -rf tmp
-    - name: cmake_blas_true_simd_false:
+    - name: cmake_blas_true_simd_false
       run: |
         mkdir tmp && cd tmp
         cmake -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=OFF -DUSE_BLAS=ON ..
