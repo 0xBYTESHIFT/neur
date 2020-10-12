@@ -1,0 +1,55 @@
+name: CmakeCI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  deps:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: install deps
+      run: sudo apt install -y clang-10 git cmake
+  cmake_blas_false_simd_false:
+    needs: deps
+    runs-on: ubuntu-latest
+    steps:
+    - name: cmake config 
+      working-directory: /home/runner/work/neur/neur
+      run: mkdir 0 && cd 0 && cmake .. -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=OFF -DUSE_BLAS=OFF
+    - name: cmake build
+      working-directory: /home/runner/work/neur/neur/0
+      run: cmake --build . 
+  cmake_blas_false_simd_true:
+    needs: deps
+    runs-on: ubuntu-latest
+    steps:
+    - name: cmake config 
+      working-directory: /home/runner/work/neur/neur
+      run: mkdir 1 && cd 1 && cmake .. -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=ON -DUSE_BLAS=OFF
+    - name: cmake build
+      working-directory: /home/runner/work/neur/neur/1
+      run: cmake --build . 
+  cmake_blas_true_simd_false:
+    needs: deps
+    runs-on: ubuntu-latest
+    steps:
+    - name: cmake config 
+      working-directory: /home/runner/work/neur/neur
+      run: mkdir 2 && cd 2 && cmake .. -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=OFF -DUSE_BLAS=ON
+    - name: cmake build
+      working-directory: /home/runner/work/neur/neur/2
+      run: cmake --build . 
+  cmake_blas_true_simd_true:
+    needs: deps
+    runs-on: ubuntu-latest
+    steps:
+    - name: cmake config 
+      working-directory: /home/runner/work/neur/neur
+      run: mkdir 3 && cd 3 && cmake .. -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=ON -DUSE_BLAS=ON
+    - name: cmake build
+      working-directory: /home/runner/work/neur/neur/3
+      run: cmake --build . 
