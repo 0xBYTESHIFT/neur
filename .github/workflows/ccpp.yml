@@ -7,49 +7,32 @@ on:
     branches: [ master ]
 
 jobs:
-  deps:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: install deps
       run: sudo apt install -y clang-10 git cmake
-
-  cmake_blas_false_simd_false:
-    needs: deps
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: build
+    - name: cmake_blas_false_simd_false
       run: |
-        cmake -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=OFF -DUSE_BLAS=OFF .
+        mkdir tmp && cd tmp
+        cmake -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=OFF -DUSE_BLAS=OFF ..
         cmake --build . 
-
-  cmake_blas_false_simd_true:
-    needs: deps
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: build
+        cd .. && rm -rf tmp
+    - name: cmake_blas_false_simd_true
       run: |
-        cmake . -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=ON -DUSE_BLAS=OFF
+        mkdir tmp && cd tmp
+        cmake -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=ON -DUSE_BLAS=OFF ..
         cmake --build . 
-
-  cmake_blas_true_simd_false:
-    needs: deps
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: build
+        cd .. && rm -rf tmp
+    - name: cmake_blas_true_simd_false:
       run: |
-        cmake . -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=OFF -DUSE_BLAS=ON
+        mkdir tmp && cd tmp
+        cmake -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=OFF -DUSE_BLAS=ON ..
         cmake --build . 
-
-  cmake_blas_true_simd_true:
-    needs: deps
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: build
+        cd .. && rm -rf tmp
+    - name: cmake_blas_true_simd_true
       run: |
-        cmake . -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=ON -DUSE_BLAS=ON
+        mkdir tmp && cd tmp
+        cmake -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=ON -DUSE_BLAS=ON ..
         cmake --build . 
+        cd .. && rm -rf tmp
