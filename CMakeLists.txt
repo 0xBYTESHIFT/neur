@@ -78,6 +78,7 @@ if(USE_SIMD)
     )
 endif()
 
+add_test(brain_test brain_test)
 
 # add_executable(test_chromosome tests/test_chromosome.cpp)
 # add_test(test_chromosome test_chromosome)
