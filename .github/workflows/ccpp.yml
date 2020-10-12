@@ -13,35 +13,43 @@ jobs:
     - uses: actions/checkout@v2
     - name: install deps
       run: sudo apt install -y clang-10 git cmake
+
   cmake_blas_false_simd_false:
     needs: deps
     runs-on: ubuntu-latest
     steps:
-    - name: cmake config 
-      run: sudo cmake . -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=OFF -DUSE_BLAS=OFF
-    - name: cmake build
-      run: sudo cmake --build . 
+    - uses: actions/checkout@v2
+    - name: build
+      run: |
+        cmake -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=OFF -DUSE_BLAS=OFF .
+        cmake --build . 
+
   cmake_blas_false_simd_true:
     needs: deps
     runs-on: ubuntu-latest
     steps:
-    - name: cmake config 
-      run: cmake . -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=ON -DUSE_BLAS=OFF
-    - name: cmake build
-      run: cmake --build . 
+    - uses: actions/checkout@v2
+    - name: build
+      run: |
+        cmake . -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=ON -DUSE_BLAS=OFF
+        cmake --build . 
+
   cmake_blas_true_simd_false:
     needs: deps
     runs-on: ubuntu-latest
     steps:
-    - name: cmake config 
-      run: cmake . -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=OFF -DUSE_BLAS=ON
-    - name: cmake build
-      run: cmake --build . 
+    - uses: actions/checkout@v2
+    - name: build
+      run: |
+        cmake . -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=OFF -DUSE_BLAS=ON
+        cmake --build . 
+
   cmake_blas_true_simd_true:
     needs: deps
     runs-on: ubuntu-latest
     steps:
-    - name: cmake config 
-      run: cmake . -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=ON -DUSE_BLAS=ON
-    - name: cmake build
-      run: cmake --build . 
+    - uses: actions/checkout@v2
+    - name: build
+      run: |
+        cmake . -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=ON -DUSE_BLAS=ON
+        cmake --build . 
