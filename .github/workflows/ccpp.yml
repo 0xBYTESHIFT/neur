@@ -18,9 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: cmake config 
-      run: cmake . -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=OFF -DUSE_BLAS=OFF
+      run: sudo cmake . -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=OFF -DUSE_BLAS=OFF
     - name: cmake build
-      run: cmake --build . 
+      run: sudo cmake --build . 
   cmake_blas_false_simd_true:
     needs: deps
     runs-on: ubuntu-latest
