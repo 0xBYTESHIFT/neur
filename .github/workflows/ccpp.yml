@@ -18,38 +18,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: cmake config 
-      working-directory: /home/runner/work/neur/neur
       run: cmake . -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=OFF -DUSE_BLAS=OFF
     - name: cmake build
-      working-directory: /home/runner/work/neur/neur/
       run: cmake --build . 
   cmake_blas_false_simd_true:
     needs: deps
     runs-on: ubuntu-latest
     steps:
     - name: cmake config 
-      working-directory: /home/runner/work/neur/neur
-      run: ls . && ls .. && cmake . -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=ON -DUSE_BLAS=OFF
+      run: cmake . -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=ON -DUSE_BLAS=OFF
     - name: cmake build
-      working-directory: /home/runner/work/neur/neur/
       run: cmake --build . 
   cmake_blas_true_simd_false:
     needs: deps
     runs-on: ubuntu-latest
     steps:
     - name: cmake config 
-      working-directory: /home/runner/work/neur/neur
       run: cmake . -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=OFF -DUSE_BLAS=ON
     - name: cmake build
-      working-directory: /home/runner/work/neur/neur/
       run: cmake --build . 
   cmake_blas_true_simd_true:
     needs: deps
     runs-on: ubuntu-latest
     steps:
     - name: cmake config 
-      working-directory: /home/runner/work/neur/neur
       run: cmake . -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=ON -DUSE_BLAS=ON
     - name: cmake build
-      working-directory: /home/runner/work/neur/neur/
       run: cmake --build . 
