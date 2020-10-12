@@ -44,6 +44,7 @@ int main(int argc, char* argv[]){
     auto t0 = std::chrono::steady_clock::now();
     auto out = b.process(in0);
     auto t1 = std::chrono::steady_clock::now();
+    assert(xt::all(out, 1.f));
 
     auto us = std::chrono::duration_cast<std::chrono::microseconds>(t1-t0);
     std::cout << us.count() << "us\n";
