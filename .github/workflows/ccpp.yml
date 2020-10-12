@@ -12,7 +12,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: install deps
-      run: sudo apt install -y clang-10 git cmake libopenblas-dev
+      run: sudo apt install -y clang-10 git cmake libopenblas-dev libopenblas0-openmp
     - name: cmake_blas_false_simd_false
       run: |
         mkdir tmp && cd tmp
