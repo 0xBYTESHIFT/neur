@@ -12,7 +12,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: install deps
-      run: sudo apt install -y clang-10 git cmake libopenblas-dev libopenblas0-openmp
+      run: sudo apt install -y clang-10 git cmake libopenblas-dev
     - name: cmake_blas_false_simd_false
       run: |
         mkdir tmp && cd tmp
@@ -24,20 +24,6 @@ jobs:
       run: |
         mkdir tmp && cd tmp
         cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=ON -DUSE_BLAS=OFF ..
-        cmake --build . 
-        ctest
-        cd .. && rm -rf tmp
-    - name: cmake_blas_true_simd_false
-      run: |
-        mkdir tmp && cd tmp
-        cmake  -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=OFF -DUSE_BLAS=ON ..
-        cmake --build . 
-        ctest
-        cd .. && rm -rf tmp
-    - name: cmake_blas_true_simd_true
-      run: |
-        mkdir tmp && cd tmp
-        cmake  -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=ON -DUSE_BLAS=ON ..
         cmake --build . 
         ctest
         cd .. && rm -rf tmp
