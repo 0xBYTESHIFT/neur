@@ -36,8 +36,8 @@ endmacro()
 find_fetch(xtl https://github.com/xtensor-stack/xtl)
 
 if(USE_SIMD)
-    find_fetch(xsimd https://github.com/xtensor-stack/xsimd)
     set(XTENSOR_USE_XSIMD 1)
+    find_fetch(xsimd https://github.com/xtensor-stack/xsimd)
 endif()
 
 find_fetch(xtensor https://github.com/xtensor-stack/xtensor)
@@ -65,19 +65,15 @@ target_link_libraries(brain_test
     xtensor
 )
 
-if(USE_BLAS)
-    target_link_libraries(brain_test
-        OpenBLAS::OpenBLAS
-        xtensor-blas
-    )
-endif()
-
 if(USE_SIMD)
-    target_link_libraries(brain_test
-        xsimd
-    )
+    target_link_libraries(brain_test xsimd)
 endif()
 
+if(USE_BLAS)
+    target_link_libraries(brain_test OpenBLAS::OpenBLAS xtensor-blas)
+endif()
+
+add_test(brain_test brain_test)
 
 # add_executable(test_chromosome tests/test_chromosome.cpp)
 # add_test(test_chromosome test_chromosome)
