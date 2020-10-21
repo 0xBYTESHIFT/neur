@@ -1,7 +1,7 @@
 #include <iostream>
 #include <xtensor/xio.hpp>
 #include <xtensor/xrandom.hpp>
-#include "brain.h"
+#include "neur/brain.h"
 
 using namespace neur;
 
@@ -13,7 +13,7 @@ int main(int argc, char* argv[]){
     const int outs =  10;
     const int size = 5000;
 
-    xt::xarray<T> weights0 = xt::arange<T>(size).reshape({ ins, size});
+    xt::xarray<T> weights0 = xt::arange<T>(ins*size).reshape({ ins, size});
     xt::xarray<T> weights1 = xt::arange<T>(size*size).reshape({size, size});
     xt::xarray<T> weights2 = xt::arange<T>(size*outs).reshape({ size, outs});
     xt::xarray<T> in0 = xt::random::rand<float>({ins})*1000;
@@ -31,9 +31,10 @@ int main(int argc, char* argv[]){
     l2.set_activation_args(xt::ones<T>({1, outs}));
 
     brain b;
-    b.insert(b.begin()+0, std::move(l0));
-    b.insert(b.begin()+1, std::move(l1));
-    b.insert(b.begin()+2, std::move(l2));
+    auto it = b.begin();
+    it = b.insert(it, std::move(l0));
+    it = b.insert(it, std::move(l1));
+    it = b.insert(it, std::move(l2));
     size_t i=0;
     for(auto &lr:b){
         std::cout << i << "/" << b.size()

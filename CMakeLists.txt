@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13.0)
-project(neur VERSION 0.1.2)
+project(neur VERSION 0.1.3)
 
 include(CTest)
 enable_testing()
@@ -11,6 +11,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -s -DNDEBUG -march=n
 
 option(USE_BLAS "use openblas" OFF)
 option(USE_SIMD "use xsimd" ON)
+option(USE_JSON "use json loading/saving" ON)
 
 include(FetchContent)
 include(CheckCXXCompilerFlag)
@@ -21,6 +22,7 @@ macro(find_fetch package repo)
         message(STATUS "fetching ${package} from ${repo}")
         FetchContent_Declare(${package}
             GIT_REPOSITORY ${repo}
+            GIT_SHALLOW true
         )
         FetchContent_MakeAvailable(${package})
         FetchContent_GetProperties(${package})
@@ -38,6 +40,12 @@ find_fetch(xtl https://github.com/xtensor-stack/xtl)
 if(USE_SIMD)
     set(XTENSOR_USE_XSIMD 1)
     find_fetch(xsimd https://github.com/xtensor-stack/xsimd)
+endif()
+
+if(USE_JSON)
+    set(JSON_BuildTests OFF CACHE INTERNAL "")
+    find_fetch(nlohmann_json https://github.com/nlohmann/json.git)
+    include_directories(${nlohmann_json_SOURCE_DIR}/single_include)
 endif()
 
 find_fetch(xtensor https://github.com/xtensor-stack/xtensor)
@@ -58,12 +66,8 @@ endif()
 add_library(neur INTERFACE)
 target_include_directories(neur INTERFACE include/) 
 
-add_executable(brain_test main.cpp)
-target_link_libraries(brain_test
-    neur
-    xtl
-    xtensor
-)
+add_executable(brain_test tests/test_brain_common.cpp)
+target_link_libraries(brain_test neur xtl xtensor)
 
 if(USE_SIMD)
     target_link_libraries(brain_test xsimd)
@@ -73,7 +77,16 @@ if(USE_BLAS)
     target_link_libraries(brain_test OpenBLAS::OpenBLAS xtensor-blas)
 endif()
 
+if(USE_JSON)
+    target_link_libraries(brain_test nlohmann_json)
+endif()
+
 add_test(brain_test brain_test)
+
+if(USE_JSON)
+    add_executable(brain_io_test tests/test_brain_io.cpp)
+    target_link_libraries(brain_io_test neur xtl xtensor nlohmann_json)
+endif()
 
 # add_executable(test_chromosome tests/test_chromosome.cpp)
 # add_test(test_chromosome test_chromosome)

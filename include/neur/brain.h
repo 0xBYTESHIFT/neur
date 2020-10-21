@@ -1,6 +1,6 @@
 #pragma once
-#include "layer.h"
-#include "wrapper.h"
+#include "neur/layer.h"
+#include "neur/wrapper.h"
 
 namespace neur{
 
