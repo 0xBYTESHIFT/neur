@@ -86,6 +86,7 @@ add_test(brain_test brain_test)
 if(USE_JSON)
     add_executable(brain_io_test tests/test_brain_io.cpp)
     target_link_libraries(brain_io_test neur xtl xtensor nlohmann_json)
+    add_test(brain_io_test brain_io_test)
 endif()
 
 # add_executable(test_chromosome tests/test_chromosome.cpp)
