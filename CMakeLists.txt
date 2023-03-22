@@ -1,101 +1,77 @@
-cmake_minimum_required(VERSION 3.13.0)
-project(neur VERSION 0.1.3)
+cmake_minimum_required(VERSION 3.18.0)
+project(neur VERSION 0.1.4)
 
-include(CTest)
-enable_testing()
+set( CMAKE_CXX_STANDARD 17 )
+
+include(cmake/CPM.cmake)
+include(CheckCXXCompilerFlag)
+
 include_directories(include)
 
-set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
-set(CMAKE_POLICY_DEFAULT_CMP0079 NEW)
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -s -DNDEBUG -march=native")
+set(CPM_SOURCE_CACHE ".CPM")
 
-option(USE_BLAS "use openblas" OFF)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 option(USE_SIMD "use xsimd" ON)
 option(USE_JSON "use json loading/saving" ON)
 
-include(FetchContent)
-include(CheckCXXCompilerFlag)
-
-macro(find_fetch package repo)
-    find_package(${package} QUIET)
-    if(NOT ${${package}_FOUND})
-        message(STATUS "fetching ${package} from ${repo}")
-        FetchContent_Declare(${package}
-            GIT_REPOSITORY ${repo}
-            GIT_SHALLOW true
-        )
-        FetchContent_MakeAvailable(${package})
-        FetchContent_GetProperties(${package})
-        if(NOT ${${package}_POPULATED})
-          FetchContent_Populate(${package})
-          add_subdirectory(${${package}_SOURCE_DIR} ${${package}_BINARY_DIR})
-        endif(NOT ${${package}_POPULATED})
-        list(APPEND CMAKE_PREFIX_PATH ${${package}_BINARY_DIR})
-        find_package(${package} REQUIRED)
-    endif(NOT ${${package}_FOUND})
-endmacro()
-
-find_fetch(xtl https://github.com/xtensor-stack/xtl)
-
-if(USE_SIMD)
-    set(XTENSOR_USE_XSIMD 1)
-    find_fetch(xsimd https://github.com/xtensor-stack/xsimd)
+if(NOT DEFINED BLAS_VENDOR)
+  set(BLAS_VENDOR OpenBLAS)
 endif()
 
+find_package(BLAS REQUIRED)
+
+CPMAddPackage("gh:xtensor-stack/xtl#0.7.5")
+CPMAddPackage("gh:xtensor-stack/xtensor#0.24.4")
+CPMAddPackage("gh:xtensor-stack/xtensor-blas#0.20.0")
+CPMAddPackage("gh:gabime/spdlog#v1.11.0")
+CPMAddPackage("gh:google/googletest#release-1.12.1")
+
+if(USE_SIMD)
+    CPMAddPackage("gh:xtensor-stack/xsimd#8.0.3")
+endif()
 if(USE_JSON)
     set(JSON_BuildTests OFF CACHE INTERNAL "")
-    find_fetch(nlohmann_json https://github.com/nlohmann/json.git)
+    CPMAddPackage("gh:nlohmann/json#v3.11.2")
     include_directories(${nlohmann_json_SOURCE_DIR}/single_include)
 endif()
 
-find_fetch(xtensor https://github.com/xtensor-stack/xtensor)
-
-if(USE_BLAS)
-    set(BLAS_VENDOR OpenBLAS)
-    find_package(OpenBLAS QUIET)
-    set(BLAS_LIB OpenBLAS_LIB)
-    set(BLAS_DIR OpenBLAS_DIR)
-    set(BLAS_INCLUDE_DIR OpenBLAS_INCLUDE_DIR)
-    if(NOT OpenBLAS_FOUND)
-        message(FATAL_ERROR "no openblas")
-    endif()
-    find_fetch(xtensor-blas https://github.com/xtensor-stack/xtensor-blas)
-else()
+# library
+add_library(neur INTERFACE)
+target_include_directories(neur INTERFACE
+    include/
+    ${spdlog_SOURCE_DIR}/include
+    ${xtensor-blas_SOURCE_DIR}/include
+) 
+if(USE_SIMD)
+    target_compile_definitions(neur INTERFACE NEUR_SIMD=1)
+endif()
+target_link_libraries(neur INTERFACE
+    xtl xtensor xtensor-blas
+    BLAS::BLAS
+    spdlog
+    gtest gtest_main gmock
+)
+if(USE_JSON)
+    target_link_libraries(neur INTERFACE nlohmann_json)
+endif()
+if(USE_SIMD)
+    target_link_libraries(neur INTERFACE xsimd)
 endif()
 
-add_library(neur INTERFACE)
-target_include_directories(neur INTERFACE include/) 
+# tests
+include(CTest)
+enable_testing()
 
 add_executable(brain_test tests/test_brain_common.cpp)
-target_link_libraries(brain_test neur xtl xtensor)
-
-if(USE_SIMD)
-    target_link_libraries(brain_test xsimd)
-endif()
-
-if(USE_BLAS)
-    target_link_libraries(brain_test OpenBLAS::OpenBLAS xtensor-blas)
-endif()
-
-if(USE_JSON)
-    target_link_libraries(brain_test nlohmann_json)
-endif()
+target_link_libraries(brain_test neur)
 
 add_test(brain_test brain_test)
 
 if(USE_JSON)
     add_executable(brain_io_test tests/test_brain_io.cpp)
-    target_link_libraries(brain_io_test neur xtl xtensor nlohmann_json)
+    target_link_libraries(brain_io_test neur)
     add_test(brain_io_test brain_io_test)
 endif()
 
 # add_executable(test_chromosome tests/test_chromosome.cpp)
 # add_test(test_chromosome test_chromosome)
-
-set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-include(CPack)
-
-unset(USE_BLAS)
-unset(USE_SIMD)
-unset(XTENSOR_USE_XSIMD)
