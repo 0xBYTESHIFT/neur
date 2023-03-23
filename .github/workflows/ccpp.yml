@@ -2,7 +2,7 @@ name: CmakeCI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, dev ]
   pull_request:
     branches: [ master ]
 
@@ -12,18 +12,18 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: install deps
-      run: sudo apt install -y clang-10 git cmake libopenblas-dev
-    - name: cmake_blas_false_simd_false
+      run: sudo apt install -y clang git cmake libopenblas-dev
+    - name: cmake_blas_true_simd_false
       run: |
         mkdir tmp && cd tmp
-        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=OFF -DUSE_BLAS=OFF ..
-        cmake --build . 
+        CXX=clang++ CC=clang cmake -DCMAKE_BUILD_TYPE=Release -DUSE_SIMD=OFF -DUSE_BLAS=ON ..
+        cmake --build . --parallel
         ctest
         cd .. && rm -rf tmp
-    - name: cmake_blas_false_simd_true
+    - name: cmake_blas_true_simd_true
       run: |
         mkdir tmp && cd tmp
-        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DUSE_SIMD=ON -DUSE_BLAS=OFF ..
-        cmake --build . 
+        CXX=clang++ CC=clang cmake -DCMAKE_BUILD_TYPE=Release -DUSE_SIMD=ON -DUSE_BLAS=ON ..
+        cmake --build . --parallel
         ctest
         cd .. && rm -rf tmp
