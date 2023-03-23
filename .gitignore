@@ -1,1 +1,6 @@
 build/
+.CPM
+*.json
+*.exe
+.clang-format
+.cache
