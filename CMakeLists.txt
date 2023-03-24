@@ -11,8 +11,9 @@ include_directories(include)
 set(CPM_SOURCE_CACHE ".CPM")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-option(USE_SIMD "use xsimd" ON)
-option(USE_JSON "use json loading/saving" ON)
+option(NEUR_USE_SIMD "use xsimd" ON)
+option(NEUR_USE_JSON "use json loading/saving" ON)
+option(NEUR_BUILD_TESTS "build tests" ON)
 
 if(NOT DEFINED BLAS_VENDOR)
   set(BLAS_VENDOR OpenBLAS)
@@ -24,12 +25,15 @@ CPMAddPackage("gh:xtensor-stack/xtl#0.7.5")
 CPMAddPackage("gh:xtensor-stack/xtensor#0.24.4")
 CPMAddPackage("gh:xtensor-stack/xtensor-blas#0.20.0")
 CPMAddPackage("gh:gabime/spdlog#v1.11.0")
-CPMAddPackage("gh:google/googletest#release-1.12.1")
 
-if(USE_SIMD)
+if( NEUR_BUILD_TESTS )
+    CPMAddPackage("gh:google/googletest#release-1.12.1")
+endif()
+
+if( NEUR_USE_SIMD )
     CPMAddPackage("gh:xtensor-stack/xsimd#8.0.3")
 endif()
-if(USE_JSON)
+if( NEUR_USE_JSON )
     set(JSON_BuildTests OFF CACHE INTERNAL "")
     CPMAddPackage("gh:nlohmann/json#v3.11.2")
     include_directories(${nlohmann_json_SOURCE_DIR}/single_include)
@@ -42,36 +46,39 @@ target_include_directories(neur INTERFACE
     ${spdlog_SOURCE_DIR}/include
     ${xtensor-blas_SOURCE_DIR}/include
 ) 
-if(USE_SIMD)
+if( NEUR_USE_SIMD )
     target_compile_definitions(neur INTERFACE NEUR_SIMD=1)
 endif()
+
 target_link_libraries(neur INTERFACE
     xtl xtensor xtensor-blas
     BLAS::BLAS
     spdlog
-    gtest gtest_main gmock
 )
-if(USE_JSON)
+if( NEUR_USE_JSON )
     target_link_libraries(neur INTERFACE nlohmann_json)
 endif()
-if(USE_SIMD)
+if( NEUR_USE_SIMD )
     target_link_libraries(neur INTERFACE xsimd)
 endif()
 
-# tests
+# === tests ===
+if( NOT NEUR_BUILD_TESTS )
+    return()
+endif()
+
 include(CTest)
 enable_testing()
 
 add_executable(brain_test tests/test_brain_common.cpp)
-target_link_libraries(brain_test neur)
+target_link_libraries(brain_test neur 
+    gtest gtest_main gmock)
 
 add_test(brain_test brain_test)
 
-if(USE_JSON)
+if( NEUR_USE_JSON )
     add_executable(brain_io_test tests/test_brain_io.cpp)
-    target_link_libraries(brain_io_test neur)
+    target_link_libraries(brain_io_test neur 
+        gtest gtest_main gmock)
     add_test(brain_io_test brain_io_test)
 endif()
-
-# add_executable(test_chromosome tests/test_chromosome.cpp)
-# add_test(test_chromosome test_chromosome)
