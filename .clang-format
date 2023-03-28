@@ -1,0 +1,17 @@
+BasedOnStyle:  Google
+ColumnLimit: 80
+
+---
+Language: Cpp
+
+# Use tabs with a width of 4 spaces.
+IndentWidth: 4
+UseTab: Never
+
+# Add spaces within brackets for function arguments.
+SpacesInParentheses: true
+SpaceInEmptyParentheses: false
+
+SortIncludes: true
+
+---
